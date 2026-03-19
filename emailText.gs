@@ -5,7 +5,7 @@ function prepReminderForEvent(eventData) {
   const dayMonth = Utilities.formatDate(eventData.startTime, CONFIG.reminderTimezone, 'dd MMM');
 
   let plainBody = `Hi,\n\nThis is a gentle reminder for the upcoming meeting "${eventData.title}" taking place next ${weekday} ${dayMonth} ${time}. Please review and add items to the agenda. \n\n`;
-  let htmlBody = `<p>Hi,</p><p>This is a gentle reminder for the upcoming meeting <b>${eventData.title}</b> taking place next <b>${weekday}</b> ${dayMonth} at <b>${time}</b>. Please review and add items to the agenda.</p>`;
+  let htmlBody = `<p>Hi,</p><p>This is a gentle reminder for the upcoming meeting <b>${escapeHtml(eventData.title)}</b> taking place next <b>${weekday}</b> ${dayMonth} at <b>${time}</b>. Please review and add items to the agenda.</p>`;
 
   if (details.agenda) {
     plainBody += `📄 Agenda: ${details.agenda}\n`;

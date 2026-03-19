@@ -5,7 +5,7 @@ function extractEventDetailsFromDescription(description) {
   const contactMatch = CONFIG.contactEmailDomain
     ? description.match(
         new RegExp(
-          `Contact:\\s*([^,]+),\\s*(\\S+@${CONFIG.contactEmailDomain})`,
+          `Contact:\\s*([^,]+),\\s*(\\S+@${CONFIG.contactEmailDomain})\\b`,
           'i'
         )
       )
