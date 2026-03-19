@@ -1,4 +1,4 @@
-// Configuration and helpers.
+// Configuration and helpers. All fields are required.
 
 const CONFIG = {
   timezone: 'Europe/London',

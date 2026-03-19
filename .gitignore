@@ -13,5 +13,5 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Sensitive files
-confi.js
+# Sensitive file
+config.js
