@@ -1,10 +1,25 @@
 // Link need to pasted in the event description.
-function extractLinksFromDescription(description) {
+function extractEventDetailsFromDescription(description) {
   const agendaMatch = description.match(/.*?Agenda:.*?<a href="(https:\/\/\S+)"/i);
   const zoomMatch = description.match(/.*?Zoom:.*?<a href="(https:\/\/\S+)"/i);
+  const contactMatch = CONFIG.contactEmailDomain
+    ? description.match(
+        new RegExp(
+          `Contact:\\s*([^,]+),\\s*(\\S+@${CONFIG.contactEmailDomain})`,
+          'i'
+        )
+      )
+    : null;
+
   return {
     zoom: zoomMatch ? zoomMatch[1] : null,
     agenda: agendaMatch ? agendaMatch[1] : null,
+    contact: contactMatch
+      ? {
+          name: contactMatch[1].trim(),
+          email: contactMatch[2].trim(),
+        }
+      : null,
   };
 }
 

@@ -6,6 +6,7 @@ const CONFIG = {
   reminderTimezone: 'Europe/Paris',
   reminderTag: '#reminder_email',
   reminderParam: 'reminder_days',
+  contactEmailDomain: 'elixir-europe.org',
   // Calendar IDs to scan for reminders
   calendarIds: [
 

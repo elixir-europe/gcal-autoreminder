@@ -49,8 +49,7 @@ function sendReminderEmailFromStore(e) {
     }
   });
 
-  const config = getConfigOrThrow();
-  var sheet = SpreadsheetApp.openById(config.spreadsheetLogId).getSheetByName('Logs');
+  var sheet = SpreadsheetApp.openById(CONFIG.spreadsheetLogId).getSheetByName('Logs');
 
   // Create an array of values you want to log
   var rowData = [

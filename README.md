@@ -25,6 +25,7 @@ Example event description snippets:
 - `#reminder_email` schedules every reminder defined in `CONFIG.reminderSchedules`.
 - `#reminder_email reminder_days=1` schedules only the 1-day reminder.
 - `#reminder_email reminder_days=1,7` schedules the 1-day and 7-day reminders.
+- `Contact: Mihail Anton, mihail.anton@elixir-europe.org` adds the contact person to the reminder email footer when the email domain matches `CONFIG.contactEmailDomain`.
 - If you change `CONFIG.reminderTag` to `#board_reminder`, then `#board_reminder reminder_days=7` becomes the matching form.
 
 ## Project structure
@@ -37,6 +38,7 @@ Example event description snippets:
    - `reminderTimezone`: Timezone used in email formatting.
    - `reminderTag`: Shared tag in event descriptions (for example `#reminder_email`).
    - `reminderParam`: Shared param in event descriptions (for example `reminder_days`).
+   - `contactEmailDomain`: Allowed domain for `Contact:` email parsing (for example `elixir-europe.org`).
    - `weekendDays`: ISO weekday numbers (1=Mon ... 7=Sun).
    - `reminderSchedules`: Array of objects `{ daysAhead, minHour, maxHour }`.
 - `dateUtils.gs` — date math and weekend handling
@@ -120,6 +122,7 @@ In the Apps Script UI:
 
 ## Testing tips
 - Add a test event with the shared reminder tag in the description, for example `#reminder_email` or `#reminder_email reminder_days=1`.
+- Add `Contact: Mihail Anton, mihail.anton@elixir-europe.org` to the event description to verify the contact block is appended near the bottom of the email.
 - Temporarily set a reminder schedule to `daysAhead: 0` and a narrow time window.
 - Check the `Logs` sheet for sent emails.
 
