@@ -1,12 +1,12 @@
 # gcal-autoreminder
 Automated reminders for Google Calendar using Google Apps Script.
 
-This project scans calendar events tagged with `CONFIG.reminderTag` and schedules reminder emails to event guests ahead of time. Reminders are scheduled by creating time-based triggers that send emails later.
+This project scans calendar events for a shared reminder tag defined in `CONFIG.reminderTag` and schedules reminder emails to event guests ahead of time. Reminders are scheduled by creating time-based triggers that send emails later.
 
 ## How it works
 - `scheduleForCalendars()` runs on a schedule (daily) and scans calendars listed in `CONFIG.calendarIds`.
-- For each calendar event on the target day(s), it looks for `CONFIG.reminderTag` in the event description.
-- If found, it builds an email and creates a time-based trigger to send it later that day.
+- For each calendar event on the target day(s), it checks for `CONFIG.reminderTag`. If that tag is present on its own, the event gets every reminder defined in `CONFIG.reminderSchedules`. If a matching reminder param is also present, it can narrow that down.
+- If the tag and schedule param match, it builds an email and creates a time-based trigger to send it later that day.
 - When the trigger fires, `sendReminderEmailFromStore()` sends the email and logs it to a spreadsheet.
 
 ### Reminder timing
@@ -14,20 +14,33 @@ This project scans calendar events tagged with `CONFIG.reminderTag` and schedule
 - If a target reminder day lands on a weekend (as defined by `CONFIG.weekendDays`), it is pushed forward to the next workday.
 - The script does not schedule new reminders on weekend days (also based on `CONFIG.weekendDays`).
 
+### Reminder tags and params
+The project config defines:
+- `reminderTag`: Required marker that must appear in the event description.
+- `reminderTag` on its own applies every configured reminder in `CONFIG.reminderSchedules`.
+- `reminderParam`: Shared parameter name used to restrict schedules by `daysAhead`, for example `reminder_days=1,7`.
+- The param syntax is strict: use a single token like `reminder_days=1,7` with no spaces around `=`.
+
+Example event description snippets:
+- `#reminder_email` schedules every reminder defined in `CONFIG.reminderSchedules`.
+- `#reminder_email reminder_days=1` schedules only the 1-day reminder.
+- `#reminder_email reminder_days=1,7` schedules the 1-day and 7-day reminders.
+- If you change `CONFIG.reminderTag` to `#board_reminder`, then `#board_reminder reminder_days=7` becomes the matching form.
+
 ## Project structure
-- `Autoreminder.gs` — entry points and scheduling flow
-- `CalendarUtils.gs` — parsing event description links
-- **`Config.js`** — configuration
+- `autoreminder.gs` — entry points and scheduling flow
+- `calendarUtils.gs` — parsing event description links and reminder schedule matching
+- **`config.js`** — configuration
    - `spreadsheetLogId`: Spreadsheet ID for logs.
    - `calendarIds`: Array of calendar IDs.
    - `timezone`: Timezone used for day calculations.
    - `reminderTimezone`: Timezone used in email formatting.
-   - `reminderTag`: Tag in event descriptions (e.g. `#reminder_email`).
+   - `reminderTag`: Shared tag in event descriptions (for example `#reminder_email`).
+   - `reminderParam`: Shared param in event descriptions (for example `reminder_days`).
    - `weekendDays`: ISO weekday numbers (1=Mon ... 7=Sun).
    - `reminderSchedules`: Array of objects `{ daysAhead, minHour, maxHour }`.
-- `ConfigUtils.gs` — config validation and error email
-- `DateUtils.gs` — date math and weekend handling
-- `EmailScheduler.gs` — trigger storage + sending
+- `dateUtils.gs` — date math and weekend handling
+- `emailScheduler.gs` — trigger storage + sending
 - `ReminderComposer.gs` — email composition
 
 <details>
@@ -35,7 +48,7 @@ This project scans calendar events tagged with `CONFIG.reminderTag` and schedule
 
 1) Create a new Apps Script project in Google Drive.
 2) Copy the files from this repo into the Apps Script project.
-3) In `Config.js`, fill in:
+3) In `config.js`, fill in:
    - `spreadsheetLogId` (spreadsheet that has a `Logs` sheet)
    - `calendarIds` (list of calendars to scan)
 4) In the spreadsheet, ensure a sheet named `Logs` exists.
@@ -106,7 +119,7 @@ In the Apps Script UI:
 - Type: Day timer (choose a time)
 
 ## Testing tips
-- Add a test event with `CONFIG.reminderTag` in the description.
+- Add a test event with the shared reminder tag in the description, for example `#reminder_email` or `#reminder_email reminder_days=1`.
 - Temporarily set a reminder schedule to `daysAhead: 0` and a narrow time window.
 - Check the `Logs` sheet for sent emails.
 

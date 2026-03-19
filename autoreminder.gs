@@ -1,17 +1,17 @@
 function scheduleForCalendars() {
-  const dayOfWeek = parseInt(Utilities.formatDate(new Date(), config.timezone, 'u'), 10);
-  // if today is Saturday or Sunday, do not send reminders for tomorrrow
+  const dayOfWeek = parseInt(Utilities.formatDate(new Date(), CONFIG.timezone, 'u'), 10);
+  // If today is Saturday or Sunday, do not send reminders for tomorrow.
   if (CONFIG.weekendDays.indexOf(dayOfWeek) !== -1) return;
-  
+
   CONFIG.reminderSchedules.forEach(schedule => {
     const increment = adjustIncrementForWeekend(new Date(), schedule.daysAhead);
     CONFIG.calendarIds.forEach(id =>
-      scheduleTaggedReminders(id, increment, schedule.minHour, schedule.maxHour)
+      scheduleTaggedReminders(id, schedule, increment)
     );
   });
 }
 
-function scheduleTaggedReminders(calendarId, increment, minReminderHour, maxReminderHour) {
+function scheduleTaggedReminders(calendarId, schedule, increment) {
   const calendar = CalendarApp.getCalendarById(calendarId);
   if (!calendar) throw new Error(`Calendar not found: ${calendarId}`);
   const today = new Date();
@@ -22,9 +22,9 @@ function scheduleTaggedReminders(calendarId, increment, minReminderHour, maxRemi
 
   events.forEach(event => {
     const description = event.getDescription() || '';
-    if (description.includes(CONFIG.reminderTag)) {
+    if (shouldScheduleReminderForEvent(description, schedule)) {
       // Choose a random time in the work day
-      const randomHour = getRandomInt(minReminderHour, maxReminderHour);
+      const randomHour = getRandomInt(schedule.minHour, schedule.maxHour);
       const randomMinute = getRandomInt(0, 59);
       const now = new Date();
       const triggerTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), randomHour, randomMinute);
