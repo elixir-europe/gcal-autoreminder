@@ -16,7 +16,7 @@ function extractEventDetailsFromDescription(description) {
     agenda: agendaMatch ? agendaMatch[1] : null,
     contact: contactMatch
       ? {
-          name: contactMatch[1].trim(),
+          name: cleanHtmlText(contactMatch[1].trim()),
           email: contactMatch[2].trim(),
         }
       : null,
@@ -24,7 +24,7 @@ function extractEventDetailsFromDescription(description) {
 }
 
 function getDescriptionTokens(description) {
-  return description.split(/\s+/).filter(Boolean);
+  return description.split(/<|>|\s+/).filter(Boolean);
 }
 
 function getReminderDaysOverride(tokens) {
@@ -48,4 +48,21 @@ function shouldScheduleReminderForEvent(description, schedule) {
   if (!reminderDaysOverride) return true;
 
   return reminderDaysOverride.indexOf(schedule.daysAhead) !== -1;
+}
+
+function cleanHtmlText(value) {
+  return unescapeHtml(String(value))
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function unescapeHtml(value) {
+  return String(value)
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&amp;/gi, '&');
 }

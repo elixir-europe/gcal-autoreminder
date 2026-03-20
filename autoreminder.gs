@@ -23,6 +23,7 @@ function scheduleTaggedReminders(calendarId, schedule, increment) {
   events.forEach(event => {
     const description = event.getDescription() || '';
     if (shouldScheduleReminderForEvent(description, schedule)) {
+      console.log("remind: " + event.getTitle());
       // Choose a random time in the work day
       const randomHour = getRandomInt(schedule.minHour, schedule.maxHour);
       const randomMinute = getRandomInt(0, 59);
@@ -43,6 +44,6 @@ function scheduleTaggedReminders(calendarId, schedule, increment) {
       };
 
       prepReminderForEvent(eventData);
-    }
+    } else console.log("skip: " + event.getTitle());
   });
 }
