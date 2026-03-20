@@ -22,8 +22,8 @@ function prepReminderForEvent(eventData) {
     htmlBody += `<p><b>Contact:</b> ${escapeHtml(details.contact.name)}, <a href="mailto:${details.contact.email}">${details.contact.email}</a></p>`;
   }
 
-  plainBody += `\n\n— note: email generated automatically -`;
-  htmlBody += `<p><i>— note: email generated automatically -</i></p>`;
+  plainBody += `\n\n\n— note: email generated automatically -`;
+  htmlBody += `<br><p><i>— note: email generated automatically -</i></p>`;
 
   const recipients = [...new Set(eventData.guests)]; // remove duplicates
 
