@@ -45,7 +45,7 @@ function shouldScheduleReminderForEvent(description, schedule) {
   if (tokens.indexOf(CONFIG.reminderTag) === -1) return false;
 
   const reminderDaysOverride = getReminderDaysOverride(tokens);
-  if (!reminderDaysOverride) return true;
+  if (!reminderDaysOverride) return schedule.daysAhead !== 0;
 
   return reminderDaysOverride.indexOf(schedule.daysAhead) !== -1;
 }

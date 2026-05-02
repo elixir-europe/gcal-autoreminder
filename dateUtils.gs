@@ -14,3 +14,15 @@ function adjustIncrementForWeekend(today, increment) {
   // Fallback: return original increment if all 7 days are weekends.
   return increment;
 }
+
+function getTriggerTimeForReminder(schedule, event, now) {
+  if (schedule.daysAhead === 0) {
+    const hoursBeforeEvent = schedule.hoursBeforeEvent;
+    return new Date(event.getStartTime().getTime() - hoursBeforeEvent * 60 * 60 * 1000);
+  }
+
+  // Choose a random time in the work day.
+  const randomHour = getRandomInt(schedule.minHour, schedule.maxHour);
+  const randomMinute = getRandomInt(0, 59);
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), randomHour, randomMinute);
+}

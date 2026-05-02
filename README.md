@@ -5,24 +5,27 @@ This project scans calendar events for a shared reminder tag defined in `CONFIG.
 
 ## How it works
 - `scheduleForCalendars()` runs on a schedule (daily) and scans calendars listed in `CONFIG.calendarIds`.
-- For each calendar event on the target day(s), it checks for `CONFIG.reminderTag`. If that tag is present on its own, the event gets every reminder defined in `CONFIG.reminderSchedules`. If a matching reminder param is also present, it can narrow that down.
+- For each calendar event on the target day(s), it checks for `CONFIG.reminderTag`. If that tag is present on its own, the event gets the default reminders defined in `CONFIG.reminderSchedules`. If a matching reminder param is also present, it can narrow that down or opt in to same-day reminders.
 - If the tag and schedule param match, it builds an email and creates a time-based trigger to send it later that day.
 - When the trigger fires, `sendReminderEmailFromStore()` sends the email and logs it to a spreadsheet.
 
 ### Reminder timing
 - Reminder offsets and time windows are configured in `CONFIG.reminderSchedules`.
+- `daysAhead: 0` schedules a same-day reminder relative to the meeting start time, according to the value in `hoursBeforeEvent`.
 - If a target reminder day lands on a weekend (as defined by `CONFIG.weekendDays`), it is pushed forward to the next workday.
 - The script does not schedule new reminders on weekend days (also based on `CONFIG.weekendDays`).
 
 ### Reminder tags and params
 The project config defines:
 - `reminderTag`: Required marker that must appear in the event description.
-- `reminderTag` on its own applies every configured reminder in `CONFIG.reminderSchedules`.
+- `reminderTag` on its own applies every configured reminder in `CONFIG.reminderSchedules` except `daysAhead: 0`.
+- `daysAhead: 0` reminders are opt-in only and require the matching param, for example `reminder_days=0`.
 - `reminderParam`: Shared parameter name used to restrict schedules by `daysAhead`, for example `reminder_days=1,7`.
 - The param syntax is strict: use a single token like `reminder_days=1,7` with no spaces around `=`.
 
 Example event description snippets:
 - `#reminder_email` schedules every reminder defined in `CONFIG.reminderSchedules`.
+- `#reminder_email reminder_days=0` schedules only the same-day reminder.
 - `#reminder_email reminder_days=1` schedules only the 1-day reminder.
 - `#reminder_email reminder_days=1,7` schedules the 1-day and 7-day reminders.
 - `Contact: Mihail Anton, mihail.anton@elixir-europe.org` adds the contact person to the reminder email footer when the email domain matches `CONFIG.contactEmailDomain`.
@@ -40,7 +43,7 @@ Example event description snippets:
    - `reminderParam`: Shared param in event descriptions (for example `reminder_days`).
    - `contactEmailDomain`: Allowed domain for `Contact:` email parsing (for example `elixir-europe.org`).
    - `weekendDays`: ISO weekday numbers (1=Mon ... 7=Sun).
-   - `reminderSchedules`: Array of objects `{ daysAhead, minHour, maxHour }`.
+   - `reminderSchedules`: Array of objects. Future-day reminders use `{ daysAhead, minHour, maxHour }`; same-day reminders use `{ daysAhead: 0, hoursBeforeEvent }`.
 - `dateUtils.gs` — date math and weekend handling
 - `emailScheduler.gs` — trigger storage + sending
 - `ReminderComposer.gs` — email composition
@@ -123,7 +126,7 @@ In the Apps Script UI:
 ## Testing tips
 - Add a test event with the shared reminder tag in the description, for example `#reminder_email` or `#reminder_email reminder_days=1`.
 - Add `Contact: Mihail Anton, mihail.anton@elixir-europe.org` to the event description to verify the contact block is appended near the bottom of the email.
-- Temporarily set a reminder schedule to `daysAhead: 0` and a narrow time window.
+- Temporarily set a reminder schedule to `daysAhead: 0` with `hoursBeforeEvent` and use a test event far enough in the future for the trigger to be created.
 - Check the `Logs` sheet for sent emails.
 
 ## Notes

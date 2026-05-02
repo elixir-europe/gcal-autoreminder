@@ -24,11 +24,13 @@ function scheduleTaggedReminders(calendarId, schedule, increment) {
     const description = event.getDescription() || '';
     if (shouldScheduleReminderForEvent(description, schedule)) {
       console.log("remind: " + event.getTitle());
-      // Choose a random time in the work day
-      const randomHour = getRandomInt(schedule.minHour, schedule.maxHour);
-      const randomMinute = getRandomInt(0, 59);
       const now = new Date();
-      const triggerTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), randomHour, randomMinute);
+      const triggerTime = getTriggerTimeForReminder(schedule, event, now);
+      if (schedule.daysAhead === 0 && (!triggerTime || triggerTime <= now)) {
+        console.log("skip: reminder time has already passed for " + event.getTitle());
+        return;
+      }
+
       const uid = Utilities.getUuid();
       
       const eventData = {
