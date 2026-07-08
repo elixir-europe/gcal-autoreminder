@@ -42,7 +42,8 @@ function scheduleTaggedReminders(calendarId, schedule, increment) {
         guests: event.getGuestList().map(g => g.getEmail()),
         // While testing, only sending reminder to myself for now
         // guests: []
-        triggerTime: triggerTime
+        triggerTime: triggerTime,
+        reminderDaysAhead: schedule.daysAhead
       };
 
       prepReminderForEvent(eventData);

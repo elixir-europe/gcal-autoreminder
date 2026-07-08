@@ -3,9 +3,10 @@ function prepReminderForEvent(eventData) {
   const weekday = eventData.startTime.toLocaleString('en-US', { weekday: 'long' });
   const time = Utilities.formatDate(eventData.startTime, CONFIG.reminderTimezone, 'HH:mm z');
   const dayMonth = Utilities.formatDate(eventData.startTime, CONFIG.reminderTimezone, 'dd MMM');
+  const datePhrase = getReminderDatePhrase(eventData, weekday);
 
-  let plainBody = `Hi,\n\nThis is a gentle reminder for the upcoming meeting "${eventData.title}" taking place next ${weekday} ${dayMonth} ${time}. Please review and add items to the agenda. \n\n`;
-  let htmlBody = `<p>Hi,</p><p>This is a gentle reminder for the upcoming meeting <b>${escapeHtml(eventData.title)}</b> taking place next <b>${weekday}</b> ${dayMonth} at <b>${time}</b>. Please review and add items to the agenda.</p>`;
+  let plainBody = `Hi,\n\nThis is a gentle reminder for the upcoming meeting "${eventData.title}" taking place ${datePhrase} ${dayMonth} ${time}. Please review and add items to the agenda. \n\n`;
+  let htmlBody = `<p>Hi,</p><p>This is a gentle reminder for the upcoming meeting <b>${escapeHtml(eventData.title)}</b> taking place ${formatReminderDatePhraseHtml(eventData, weekday)} ${dayMonth} at <b>${time}</b>. Please review and add items to the agenda.</p>`;
 
   if (details.agenda) {
     plainBody += `📄 Agenda: ${details.agenda}\n`;
@@ -32,7 +33,7 @@ function prepReminderForEvent(eventData) {
     const preppedEmailData = {
       to: Session.getActiveUser().getEmail(),
       bcc: chunk.join(','),
-      subject: `🔔 Reminder: ${eventData.title} next ${weekday}`,
+      subject: `🔔 Reminder: ${eventData.title} ${datePhrase}`,
       plainBody: plainBody,
       htmlBody: htmlBody,
       triggerTime: eventData.triggerTime
@@ -47,6 +48,24 @@ function chunkArray(arr, size) {
     chunks.push(arr.slice(i, i + size));
   }
   return chunks;
+}
+
+function getReminderDatePhrase(eventData, weekday) {
+  if (shouldUseTomorrowPhrase(eventData, weekday)) {
+    return `tomorrow ${weekday}`;
+  }
+  return `next ${weekday}`;
+}
+
+function formatReminderDatePhraseHtml(eventData, weekday) {
+  const prefix = shouldUseTomorrowPhrase(eventData, weekday) ? 'tomorrow' : 'next';
+  return `${prefix} <b>${weekday}</b>`;
+}
+
+function shouldUseTomorrowPhrase(eventData, weekday) {
+  const tomorrowWeekdays = ['Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  return eventData.reminderDaysAhead === 1
+    && tomorrowWeekdays.indexOf(weekday) !== -1;
 }
 
 function escapeHtml(value) {
