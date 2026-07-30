@@ -28,7 +28,7 @@ Example event description snippets:
 - `#reminder_email reminder_days=0` schedules only the same-day reminder.
 - `#reminder_email reminder_days=1` schedules only the 1-day reminder.
 - `#reminder_email reminder_days=1,7` schedules the 1-day and 7-day reminders.
-- `Contact: Mike Anthony, m.a@my-org.org` adds the contact person to the reminder email footer when the email domain matches `CONFIG.contactEmailDomain`.
+- `Contact: Mike Anthony, m.a@my-org.org` adds the contact person to the reminder email footer and uses their email as the reminder's Reply-To address when the email domain matches `CONFIG.contactEmailDomain`.
 - If you change `CONFIG.reminderTag` to `#board_reminder`, then `#board_reminder reminder_days=7` becomes the matching form.
 
 ### Calendar event description examples
@@ -159,6 +159,7 @@ In the Apps Script UI:
 ## Testing tips
 - Add a test event with the shared reminder tag in the description, for example `#reminder_email` or `#reminder_email reminder_days=1`.
 - Add `Contact: Mihail Anton, mihail.anton@my-org.org` to the event description to verify the contact block is appended near the bottom of the email.
+- Send a test reminder and use your email client's Reply action to verify that it addresses the parsed contact email.
 - Temporarily set a reminder schedule to `daysAhead: 0` with `hoursBeforeEvent` and use a test event far enough in the future for the trigger to be created.
 - Check the `Logs` sheet for sent emails.
 

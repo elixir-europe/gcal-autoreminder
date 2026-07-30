@@ -30,13 +30,17 @@ function sendReminderEmailFromStore(e) {
   }
 
   const eventData = JSON.parse(payloadJson);
-  MailApp.sendEmail({
+  const mailOptions = {
     to: eventData.to,
     bcc: eventData.bcc,
     subject: eventData.subject,
     body: eventData.plainBody,
     htmlBody: eventData.htmlBody,
-  });
+  };
+  if (eventData.replyTo) {
+    mailOptions.replyTo = eventData.replyTo;
+  }
+  MailApp.sendEmail(mailOptions);
 
   // Remove the stored payload.
   props.deleteProperty(key);

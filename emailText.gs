@@ -33,6 +33,7 @@ function prepReminderForEvent(eventData) {
     const preppedEmailData = {
       to: Session.getActiveUser().getEmail(),
       bcc: chunk.join(','),
+      replyTo: details.contact?.email,
       subject: `🔔 Reminder: ${eventData.title} ${datePhrase}`,
       plainBody: plainBody,
       htmlBody: htmlBody,
