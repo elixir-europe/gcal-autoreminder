@@ -42,3 +42,29 @@ function testReminderForEventNow() {
     reminderDaysAhead: 0,
   });
 }
+
+/**
+ * Side-effect-free regression coverage for contact parsing.
+ */
+function testContactDetailsParsing() {
+  const cases = [
+    'Contact: Alex Example, alex@elixir-europe.org',
+    'Contact : Alex Example , mailto: alex@elixir-europe.org',
+    'Contact: Alex Example, <a target="_blank" href = "mailto:alex@elixir-europe.org">Alex</a>',
+  ];
+
+  cases.forEach(description => {
+    const actual = extractEventDetailsFromDescription(description).contact;
+    if (
+      !actual ||
+      actual.name !== 'Alex Example' ||
+      actual.email !== 'alex@elixir-europe.org'
+    ) {
+      throw new Error(
+        `Expected contact details, received ${JSON.stringify(actual)}`
+      );
+    }
+  });
+
+  console.log(`Passed ${cases.length} contact parsing cases.`);
+}
